@@ -1,0 +1,651 @@
+Gist on a few topics from PHP
+
+Logging in Laravel:
+Laravel logging facilities provide a simple layer on top of the powerful Monolog library. By default, Laravel is configured to create daily log files for your application which are stored in the storage/logs directory. You may write information to the log like so:
+
+Log::info('This is some useful information.');
+Log::warning('Something could be going wrong.');
+Log::error('Something is really going wrong.');
+
+The logger provides the seven logging levels defined in RFC 5424: 
+debug, info, notice, warning, error, critical, and alert.
+
+An array of contextual data may also be passed to the log methods:
+Log::info('Log message', ['context' => 'Other helpful information']);
+
+(The logging facilities for your application are configured in the Illuminate\Foundation\Bootstrap\ConfigureLogging bootstrapper class. This class utilizes the log configuration option from your config/app.php configuration file.)
+
+--
+For example, if you wish to use daily log files instead of a single, large file, you can make the following change to your start file:
+
+$logFile = 'laravel.log';
+
+Log::useDailyFiles(storage_path().'/logs/'.$logFile);
+
+
+--
+You may also register an event to catch all messages passed to the log:
+
+Registering A Log Event Listener
+Log::listen(function($level, $message, $context)
+{
+    //
+});
+
+--
+DB Query Log:
+
+Enable query log it can be done using
+DB::connection()->enableQueryLog(); //then you can use below code to see the query log
+
+$queries = DB::getQueryLog(); // if you want to see the last executed query
+$last_query = end($queries);
+
+public function show(Order $order){
+    \DB::connection()->enableQueryLog();
+    $data = $order->all();
+    $queries = \DB::getQueryLog();
+    return dd($queries);
+}
+
+
+To see the query logs in laravel.log file use the following way.
+
+namespace App\Providers;
+
+use DB;
+use Log;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        DB::listen(function($query) {
+            Log::info(
+                $query->sql,
+                $query->bindings,
+                $query->time
+            );
+        });
+    }
+
+    // ...
+}
+
+--
+DB::enableQueryLog();
+DB::getQueryLog();
+--
+
+Laravel 5.6, something like this in AppServiceProvider::boot()
+
+    // Log all DB SELECT statements
+    // @codeCoverageIgnoreStart
+    if (!app()->environment('testing') && config('app.log_sql')) {
+        DB::listen(function ($query) {
+            if (preg_match('/^select/', $query->sql)) {
+                Log::info('sql: ' .  $query->sql);
+                // Also available are $query->bindings and $query->time.
+            }
+        });
+    }
+	
+	Then in config/app.php, just so it's easy to enable/disable from amending the .env
+
+    'log_sql' => env('LOG_SQL'),
+	
+--
+Install the package via composer: by following command
+composer require dipenparmar12/laravel-query-log
+restart server. after this you will see
+storage/logs/db-query.log file containing your query logs.
+
+-----
+
+API gateway: is an API management tool that sits between a client and a collection of backend services. An API gateway acts as a reverse proxy to accept all application programming interface (API) calls, aggregate the various services required to fulfill them, and return the appropriate result.
+
+-----
+
+Dependency injection 
+is a technique in which an object receives other objects that it depends on. These other objects are called dependencies. In the typical "using" relationship the receiving object is called a client and the passed (that is, "injected") object is called a service
+
+-----
+Difference between abstract class and interface
+
+Abstract class and interface both are used to achieve abstraction where we can declare the abstract methods. Abstract class and interface both can't be instantiated.
+
+But there are many differences between abstract class and interface that are given below.
+
+Abstract class
+Example:
+abstract class Shape{
+	public abstract void draw();
+}
+
+1. Abstract class can have abstract and non-abstract methods.
+
+2. Abstract class doesn't support multiple inheritance.
+
+3. Abstract class can have final, non-final, static and non-static variables.
+
+4. Abstract class can provide the implementation of interface.
+
+5. The abstract keyword is used to declare abstract class.
+
+6. An abstract class can extend another class and implement multiple interfaces.
+
+7. An abstract class can be extended using keyword "extends".
+
+8. An abstract class can have class members like private, protected, etc.
+-
+
+Interface::
+
+Example:
+interface Drawable{
+	void draw();
+}
+
+1. Interface can have only abstract methods. Since Java 8, it can have default and static methods also.
+
+2. Interface supports multiple inheritance.
+
+3. Interface has only static and final variables.
+
+4. Interface can't provide the implementation of abstract class.
+
+5. The interface keyword is used to declare interface.
+
+6. An interface can extend another interface only.
+
+7. An interface can be implemented using keyword "implements".
+
+8. Members of an interface are public by default.
+
+
+-----
+
+SOLID Principles in Real Life - OOPs
+S - Single-responsiblity principle. A class should have one and only one reason to change, meaning that a class should have only one job.
+
+O - Open-closed principle. Objects or entities should be open for extension, but closed for modification.
+
+L - Liskov substitution principle. Let q(x) be a property provable about objects of x of type T. Then q(y) should be provable for objects y of type S where S is a subtype of T.
+
+I - Interface segregation principle. A client should never be forced to implement an interface that it doesn't use or clients shouldn't be forced to depend on methods they do not use.
+
+D - Dependency Inversion Principle. Entities must depend on abstractions not on concretions. It states that the high level module must not depend on the low level module, but they should depend on abstractions.
+-----
+
+ACID (Atomicity, Consistency, Isolation, Durability) - RDBMS
+is a set of properties of database transactions intended
+to guarantee data validity despite errors, power failures, and other mishaps.
+
+Atomicity - This property guarantees that if one part of the transaction fails, the entire transaction will fail, and the database state will be left unchanged.
+
+Consistency - This property ensures that any transaction will bring the database from one valid state to another.
+
+Isolation - This property ensures that the concurrent execution of transactions results in a system state that would be obtained if transactions were executed serially.
+
+Durable - means that once a transaction has been committed, it will remain so, even in the event of power loss.
+-----
+
+CAP Theorem:
+is for distributed computing technique was published by Eric Brewer. 
+
+This states that it is not possible for a distributed computer system to simultaneously provide all three of the following guarantees:
+
+Consistency (all nodes see the same data even at the same time with concurrent updates )
+
+Availability (a guarantee that every request receives a response about whether it was successful or failed)
+
+Partition tolerance (the system continues to operate despite arbitrary message loss or failure of part of the system)
+-
+Consistency - will all executions of reads and writes seen by all nodes be atomic or linearizably consistent.
+
+Availability - will a request made to the data store always eventually complete.
+
+Partition tolerance - the network is allowed to drop any messages.
+-----
+
+Laravel Dusk - Provides an expressive, easy-to-use browser automation and testing API.
+
+By default, Dusk does not require you to install JDK or Selenium on your local computer. Instead, Dusk uses a standalone ChromeDriver installation.
+-----
+
+Official packages provided by Laravel which are given below:
+
+Cashier - provides an expressive, fluent interfaces for billing services we build in projects.
+
+Laravel cashier implements an expressive, fluent interface to Stripe's and Braintree's subscription billing services. It controls almost all of the boilerplate subscription billing code you are dreading writing. Moreover, the cashier can also control coupons, subscription quantities, swapping subscription, cancellation grace periods, and even generate invoice PDFs.
+-
+
+Envoy - provides a clean, minimal syntax for defining frequent tasks that run on remote servers.
+
+Laravel Envoy is responsible for providing a clean, minimal syntax for defining frequent tasks that we run on our remote servers. Using Blade style syntax, one can quickly arrange tasks for deployment, Artisan commands, and more. Envoy only provides support for Mac and Linux.
+-
+
+Passport - to provide API athentication
+
+Laravel is used to create API authentication to act as a breeze with the help of Laravel passport. It further provides a full Oauth2 server implementation for Laravel application in a matter of minutes. Passport is usually assembled on top of League OAuth2 server which is maintained by Alex Bilbie.
+-
+
+Scout - for full-text search
+
+Laravel Scout is used for providing a simple, driver-based solution for adding full-text search to the eloquent models. Using model observers, Scout automatically keeps search indexes in sync with eloquent records.
+-
+
+Socialite - to provide OAuth features to integrate FB, twitter and Google etc.
+
+Laravel Socialite is used for providing an expressive, fluent interface to OAuth authentication with Facebook, Twitter, Google, and Linkedln, etc. It controls almost all the boilerplate social authentication code that you are dreading writing
+-----
+
+Monolithic Architecture: is similar to a big container wherein all the software components of an application are assembled together and tightly packaged.
+
+Service-Oriented Architecture: is a collection of services which communicate with each other. The communication can involve either simple data passing or it could involve two or more services coordinating some activity.
+
+Microservice Architecture: is an architectural style that structures an application as a collection of small autonomous services, modeled around a business domain.
+-----
+
+Concurrency: is when two or more tasks can start, run, and complete in overlapping time periods. It doesn't necessarily mean they'll ever both be running at the same instant. For example, multitasking on a single-core machine.
+
+Parallelism: is when tasks literally run at the same time, e.g., on a multicore processor.
+
+Elasticity: means that the throughput of a system scales up or down automatically to meet varying demand as resource is proportionally added or removed. The system needs to be scalable to allow it to benefit from the dynamic addition, or removal, of resources at runtime. Elasticity therefore builds upon scalability and expands on it by adding the notion of automatic resource management.
+
+Sticky session: or a session affinity technique is another popular load balancing technique that requires a user session to be always served by an allocated machine.
+-----
+
+Don't Repeat Yourself (DRY) or Duplication is Evil (DIE) is a principle of software development.
+-----
+
+Scaling Up - This involves adding more resources to the existing nodes. For example, adding more RAM, Storage or processing power.
+
+Scaling Out - This involves adding more nodes to support more users.
+-----
+
+Waterfall methodology:
+which is also known as Liner Sequential Life Cycle Model. Waterfall Model followed in the sequential order, and so project development team only moves to next phase of development or testing if the previous step completed successfully.
+
+Agile methodology:
+is a practice that helps continuous iteration of development and testing in the software development process. In this model, development and testing activities are concurrent, unlike the Waterfall model. This process allows more communication between customers, developers, managers, and testers.
+
+-----
+
+Design Patterns
+can be used in various situations to solve similar problems. There are around 23 design patters that can be broadly categorized into three types of design patterns - Creational, Structural and Behavioral patterns.
+
+Creational Patterns: Design patterns that are used in object creation mechanisms, to create objects that can be decoupled from the system that implemented them.
+
+Structural Patterns: This eases the design by identifying simple ways to realize relationships between entities
+
+Behavioral Patterns: They are used to manage relationships, responsibilities, and algorithms between objects
+
+
+
+-
+Creational:
+
+Abstract Factory 
+Lets you produce families of related objects without specifying their concrete classes.
+
+Builder 
+Lets you construct complex objects step by step. The pattern allows you to produce different types and representations of an object using the same construction code.
+
+Factory Method 
+Provides an interface for creating objects in a superclass, but allows subclasses to alter the type of objects that will be created.
+
+Prototype 
+Lets you copy existing objects without making your code dependent on their classes.
+
+Singleton 
+Lets you ensure that a class has only one instance, while providing a global access point to this instance.
+
+
+
+
+-
+Structural:
+
+Adapter 
+Allows objects with incompatible interfaces to collaborate.
+
+Bridge 
+Lets you split a large class or a set of closely related classes into two separate hierarchies—abstraction and implementation—which can be developed independently of each other.
+
+Composite 
+Lets you compose objects into tree structures and then work with these structures as if they were individual objects.
+
+Decorator 
+Lets you attach new behaviors to objects by placing these objects inside special wrapper objects that contain the behaviors.
+
+Facade 
+Provides a simplified interface to a library, a framework, or any other complex set of classes.
+
+Flyweight 
+Lets you fit more objects into the available amount of RAM by sharing common parts of state between multiple objects instead of keeping all of the data in each object.
+
+Proxy 
+Lets you provide a substitute or placeholder for another object. A proxy controls access to the original object, allowing you to perform something either before or after the request gets through to the original object.
+
+
+-
+Chain of Responsibility 
+Lets you pass requests along a chain of handlers. Upon receiving a request, each handler decides either to process the request or to pass it to the next handler in the chain.
+
+Command 
+Turns a request into a stand-alone object that contains all information about the request. This transformation lets you pass requests as a method arguments, delay or queue a request's execution, and support undoable operations.
+
+Iterator 
+Lets you traverse elements of a collection without exposing its underlying representation (list, stack, tree, etc.).
+
+Mediator 
+Lets you reduce chaotic dependencies between objects. The pattern restricts direct communications between the objects and forces them to collaborate only via a mediator object.
+
+Memento 
+Lets you save and restore the previous state of an object without revealing the details of its implementation.
+
+Observer 
+Lets you define a subscription mechanism to notify multiple objects about any events that happen to the object they're observing.
+
+State 
+Lets an object alter its behavior when its internal state changes. It appears as if the object changed its class.
+
+Strategy 
+Lets you define a family of algorithms, put each of them into a separate class, and make their objects interchangeable.
+
+Template Method 
+Defines the skeleton of an algorithm in the superclass but lets subclasses override specific steps of the algorithm without changing its structure.
+
+Visitor 
+Lets you separate algorithms from the objects on which they operate.
+
+-----
+
+Magic methods in PHP are special methods that are aimed to perform certain tasks.
+__sleep. public __sleep ( void ) : array 
+__wakeup. public __wakeup ( void ) : void
+__serialize. public __serialize ( void ) : array
+__unserialize. public __unserialize ( array $data ) : void
+__toString
+__invoke
+__set_state
+
+__sleep is supposed to return an array of the names of all variables of an object that should be serialized. 
+
+__wakeup in turn will be executed by unserialize if it is present in class. It's intention is to re-establish resources and other things that are needed to be initialized upon unserialization.
+
+-----
+
+Magic constants are the predefined constants in PHP which is used on the basis of their use. These constants are created by various extensions. There are nine magic constant in the PHP and all of the constant resolved at the compile-time, not like the regular constant which is resolved at run time
+
+ex:
+__LINE__
+__FILE__
+__DIR__
+__FUNCTION__
+__CLASS__
+__METHOD__
+__NAMESPACE__
+__TRAIT__
+
+
+-----
+PHP Array Functions
+
+array()		- Creates an array
+array_change_key_case()	- Changes all keys in an array to lowercase or uppercase
+array_chunk()	- Splits an array into chunks of arrays
+array_column()	- Returns the values from a single column in the input array
+array_combine()	- Creates an array by using the elements from one "keys" array and one "values" array
+array_count_values()	- Counts all the values of an array
+array_diff()	- Compare arrays, and returns the differences (compare values only)
+array_diff_assoc()	- Compare arrays, and returns the differences (compare keys and values)
+array_diff_key()	- Compare arrays, and returns the differences (compare keys only)
+array_diff_uassoc()	- Compare arrays, and returns the differences (compare keys and values, using a user-defined key comparison function)
+array_diff_ukey()	- Compare arrays, and returns the differences (compare keys only, using a user-defined key comparison function)
+array_fill()	- Fills an array with values
+array_fill_keys()	- Fills an array with values, specifying keys
+array_filter()	- Filters the values of an array using a callback function
+array_flip()	- Flips/Exchanges all keys with their associated values in an array
+array_intersect()	- Compare arrays, and returns the matches (compare values only)
+array_intersect_assoc()	- Compare arrays and returns the matches (compare keys and values)
+array_intersect_key()	- Compare arrays, and returns the matches (compare keys only)
+array_intersect_uassoc()	- Compare arrays, and returns the matches (compare keys and values, using a user-defined key comparison function)
+array_intersect_ukey()	- Compare arrays, and returns the matches (compare keys only, using a user-defined key comparison function)
+array_key_exists()	- Checks if the specified key exists in the array
+array_keys()	- Returns all the keys of an array
+array_map()	- Sends each value of an array to a user-made function, which returns new values
+array_merge()	- Merges one or more arrays into one array
+array_merge_recursive()	- Merges one or more arrays into one array recursively
+array_multisort()	- Sorts multiple or multi-dimensional arrays
+array_pad()	- Inserts a specified number of items, with a specified value, to an array
+array_pop()	- Deletes the last element of an array
+array_product()	- Calculates the product of the values in an array
+array_push()	- Inserts one or more elements to the end of an array
+array_rand()	- Returns one or more random keys from an array
+array_reduce()	- Returns an array as a string, using a user-defined function
+array_replace()	- Replaces the values of the first array with the values from following arrays
+array_replace_recursive()	- Replaces the values of the first array with the values from following arrays recursively
+array_reverse()	- Returns an array in the reverse order
+array_search()	- Searches an array for a given value and returns the key
+array_shift()	- Removes the first element from an array, and returns the value of the removed element
+array_slice()	- Returns selected parts of an array
+array_splice()	- Removes and replaces specified elements of an array
+array_sum()	- Returns the sum of the values in an array
+array_udiff()	- Compare arrays, and returns the differences (compare values only, using a user-defined key comparison function)
+array_udiff_assoc()	- Compare arrays, and returns the differences (compare keys and values, using a built-in function to compare the keys and a user-defined function to compare the values)
+array_udiff_uassoc()	- Compare arrays, and returns the differences (compare keys and values, using two user-defined key comparison functions)
+array_uintersect()	- Compare arrays, and returns the matches (compare values only, using a user-defined key comparison function)
+array_uintersect_assoc()	- Compare arrays, and returns the matches (compare keys and values, using a built-in function to compare the keys and a user-defined function to compare the values)
+array_uintersect_uassoc()	- Compare arrays, and returns the matches (compare keys and values, using two user-defined key comparison functions)
+array_unique()	- Removes duplicate values from an array
+array_unshift()	- Adds one or more elements to the beginning of an array
+array_values()	- Returns all the values of an array
+array_walk()	- Applies a user function to every member of an array
+array_walk_recursive()	- Applies a user function recursively to every member of an array
+arsort()	- Sorts an associative array in descending order, according to the value
+asort()	- Sorts an associative array in ascending order, according to the value
+compact()	- Create array containing variables and their values
+count()	- Returns the number of elements in an array
+current()	- Returns the current element in an array
+each()	- Deprecated from PHP 7.2. Returns the current key and value pair from an array
+end()	- Sets the internal pointer of an array to its last element
+extract()	- Imports variables into the current symbol table from an array
+in_array()	- Checks if a specified value exists in an array
+key()	- Fetches a key from an array
+krsort()	- Sorts an associative array in descending order, according to the key
+ksort()	- Sorts an associative array in ascending order, according to the key
+list()	- Assigns variables as if they were an array
+natcasesort()	- Sorts an array using a case insensitive "natural order" algorithm
+natsort()	- Sorts an array using a "natural order" algorithm
+next()	- Advance the internal array pointer of an array
+pos()	- Alias of current()
+prev()	- Rewinds the internal array pointer
+range()	- Creates an array containing a range of elements
+reset()	- Sets the internal pointer of an array to its first element
+rsort()	- Sorts an indexed array in descending order
+shuffle()	- Shuffles an array
+sizeof()	- Alias of count()
+sort()		- Sorts an indexed array in ascending order
+uasort()	- Sorts an array by values using a user-defined comparison function
+uksort()	- Sorts an array by keys using a user-defined comparison function
+usort()		- Sorts an array using a user-defined comparison function
+
+-----
+
+PHP String Functions
+The PHP string functions are part of the PHP core. No installation is required to use these functions.
+
+Function	Description
+addcslashes()	Returns a string with backslashes in front of the specified characters
+addslashes()	Returns a string with backslashes in front of predefined characters
+bin2hex()	Converts a string of ASCII characters to hexadecimal values
+chop()	Removes whitespace or other characters from the right end of a string
+chr()	Returns a character from a specified ASCII value
+chunk_split()	Splits a string into a series of smaller parts
+convert_cyr_string()	Converts a string from one Cyrillic character-set to another
+convert_uudecode()	Decodes a uuencoded string
+convert_uuencode()	Encodes a string using the uuencode algorithm
+count_chars()	Returns information about characters used in a string
+crc32()	Calculates a 32-bit CRC for a string
+crypt()	One-way string hashing
+echo()	Outputs one or more strings
+explode()	Breaks a string into an array
+fprintf()	Writes a formatted string to a specified output stream
+get_html_translation_table()	Returns the translation table used by htmlspecialchars() and htmlentities()
+hebrev()	Converts Hebrew text to visual text
+hebrevc()	Converts Hebrew text to visual text and new lines (\n) into <br>
+hex2bin()	Converts a string of hexadecimal values to ASCII characters
+html_entity_decode()	Converts HTML entities to characters
+htmlentities()	Converts characters to HTML entities
+htmlspecialchars_decode()	Converts some predefined HTML entities to characters
+htmlspecialchars()	Converts some predefined characters to HTML entities
+implode()	Returns a string from the elements of an array
+join()	Alias of implode()
+lcfirst()	Converts the first character of a string to lowercase
+levenshtein()	Returns the Levenshtein distance between two strings
+localeconv()	Returns locale numeric and monetary formatting information
+ltrim()	Removes whitespace or other characters from the left side of a string
+md5()	Calculates the MD5 hash of a string
+md5_file()	Calculates the MD5 hash of a file
+metaphone()	Calculates the metaphone key of a string
+money_format()	Returns a string formatted as a currency string
+nl_langinfo()	Returns specific local information
+nl2br()	Inserts HTML line breaks in front of each newline in a string
+number_format()	Formats a number with grouped thousands
+ord()	Returns the ASCII value of the first character of a string
+parse_str()	Parses a query string into variables
+print()	Outputs one or more strings
+printf()	Outputs a formatted string
+quoted_printable_decode()	Converts a quoted-printable string to an 8-bit string
+quoted_printable_encode()	Converts an 8-bit string to a quoted printable string
+quotemeta()	Quotes meta characters
+rtrim()	Removes whitespace or other characters from the right side of a string
+setlocale()	Sets locale information
+sha1()	Calculates the SHA-1 hash of a string
+sha1_file()	Calculates the SHA-1 hash of a file
+similar_text()	Calculates the similarity between two strings
+soundex()	Calculates the soundex key of a string
+sprintf()	Writes a formatted string to a variable
+sscanf()	Parses input from a string according to a format
+str_getcsv()	Parses a CSV string into an array
+str_ireplace()	Replaces some characters in a string (case-insensitive)
+str_pad()		Pads a string to a new length
+str_repeat()	Repeats a string a specified number of times
+str_replace()	Replaces some characters in a string (case-sensitive)
+str_rot13()		Performs the ROT13 encoding on a string
+str_shuffle()	Randomly shuffles all characters in a string
+str_split()		Splits a string into an array
+str_word_count()	Count the number of words in a string
+strcasecmp()	Compares two strings (case-insensitive)
+strchr()	Finds the first occurrence of a string inside another string (alias of strstr())
+strcmp()	Compares two strings (case-sensitive)
+strcoll()	Compares two strings (locale based string comparison)
+strcspn()	Returns the number of characters found in a string before any part of some specified characters are found
+strip_tags()	Strips HTML and PHP tags from a string
+stripcslashes()	Unquotes a string quoted with addcslashes()
+stripslashes()	Unquotes a string quoted with addslashes()
+stripos()	Returns the position of the first occurrence of a string inside another string (case-insensitive)
+stristr()	Finds the first occurrence of a string inside another string (case-insensitive)
+strlen()	Returns the length of a string
+strnatcasecmp()	Compares two strings using a "natural order" algorithm (case-insensitive)
+strnatcmp()	Compares two strings using a "natural order" algorithm (case-sensitive)
+strncasecmp()	String comparison of the first n characters (case-insensitive)
+strncmp()	String comparison of the first n characters (case-sensitive)
+strpbrk()	Searches a string for any of a set of characters
+strpos()	Returns the position of the first occurrence of a string inside another string (case-sensitive)
+strrchr()	Finds the last occurrence of a string inside another string
+strrev()	Reverses a string
+strripos()	Finds the position of the last occurrence of a string inside another string (case-insensitive)
+strrpos()	Finds the position of the last occurrence of a string inside another string (case-sensitive)
+strspn()	Returns the number of characters found in a string that contains only characters from a specified charlist
+strstr()	Finds the first occurrence of a string inside another string (case-sensitive)
+strtok()	Splits a string into smaller strings
+strtolower()	Converts a string to lowercase letters
+strtoupper()	Converts a string to uppercase letters
+strtr()	Translates certain characters in a string
+substr()	Returns a part of a string
+substr_compare()	Compares two strings from a specified start position (binary safe and optionally case-sensitive)
+substr_count()	Counts the number of times a substring occurs in a string
+substr_replace()	Replaces a part of a string with another string
+trim()	Removes whitespace or other characters from both sides of a string
+ucfirst()	Converts the first character of a string to uppercase
+ucwords()	Converts the first character of each word in a string to uppercase
+vfprintf()	Writes a formatted string to a specified output stream
+vprintf()	Outputs a formatted string
+vsprintf()	Writes a formatted string to a variable
+wordwrap()	Wraps a string to a given number of characters
+
+-----
+
+PHP Regular Expression
+
+Regular expressions allow you to search for and replace patterns in strings.
+
+Installation
+The PHP regular expression functions are part of the PHP core. No installation is required to use these functions.
+
+Runtime Configuration - These settings in php.ini can be used to limit the amount time or resources used when evaluating regular expressions.
+
+Name		Default	Description	Changeable
+pcre.backtrack_limit	"1000000"	The maximum number of backtracks that the regular expression engine is allowed to do while evaluating an expression. (available since PHP 5.2)	PHP_INI_ALL
+pcre.recursion_limit	"100000"	The maximum recursion depth that the regular expression engine is permitted to reach while evaluating an expression. (available since PHP 5.2)	PHP_INI_ALL
+pcre.jit	"1"	When set to "1" this enables PCRE's (Perl-Compatible Regular Expressions) just-in-time compilation. (available since PHP 7.0)	PHP_INI_ALL
+
+
+PHP Regular Expression Functions:
+Function		Description
+
+preg_filter()	Returns a string or an array with pattern matches replaced, but only if matches were found
+preg_grep()		Returns an array consisting only of elements from the input array which matched the pattern
+preg_last_error()	Returns an error code indicating the reason that the most recent regular expression call failed
+preg_match()	Finds the first match of a pattern in a string
+preg_match_all()	Finds all matches of a pattern in a string
+preg_replace()	Returns a string where matches of a pattern (or an array of patterns) are replaced with a substring (or an array of substrings) in a given string
+preg_replace_callback()	Given an expression and a callback, returns a string where all matches of the expression are replaced with the substring returned by the callback
+preg_replace_callback_array()	Given an array associating expressions with callbacks, returns a string where all matches of each expression are replaced with the substring returned by the callback
+preg_split()	Breaks a string into an array using matches of a regular expression as separators
+preg_quote()	Escapes characters that have a special meaning in regular expressions by putting a backslash in front of them
+
+
+Regular Expression Modifiers - Modifiers can change how a search is performed.
+Modifier	Description
+i	Performs a case-insensitive search
+m	Performs a multiline search (patterns that search for the beginning or end of a string will match the beginning or end of each line)
+u	Enables correct matching of UTF-8 encoded patterns
+
+
+Regular Expression Patterns - Brackets are used to find a range of characters:
+Expression	Description
+[abc]	Find one character from the options between the brackets
+[^abc]	Find any character NOT between the brackets
+[0-9]	Find one character from the range 0 to 9
+
+
+Metacharacters - Metacharacters are characters with a special meaning:
+Metacharacter	Description
+|	Find a match for any one of the patterns separated by | as in: cat|dog|fish
+.	Find just one instance of any character
+^	Finds a match as the beginning of a string as in: ^Hello
+$	Finds a match at the end of the string as in: World$
+\d	Find a digit
+\s	Find a whitespace character
+\b	Find a match at the beginning of a word like this: \bWORD, or at the end of a word like this: WORD\b
+\uxxxx	Find the Unicode character specified by the hexadecimal number xxxx
+
+
+Quantifiers - Quantifiers define quantities:
+Quantifier	Description
+n+	Matches any string that contains at least one n
+n*	Matches any string that contains zero or more occurrences of n
+n?	Matches any string that contains zero or one occurrences of n
+n{x}	Matches any string that contains a sequence of X n's
+n{x,y}	Matches any string that contains a sequence of X to Y n's
+n{x,}	Matches any string that contains a sequence of at least X n's
