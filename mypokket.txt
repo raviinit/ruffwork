@@ -1,0 +1,36 @@
+Using any framework of your choice (or core php/python) 
+
+> create a user REST API, which will accept two parameters: id, fmt  (id is mandatory)
+
+Q1. Return user attributes in a JSON format. (for a single id and/or multiple ids)
+
+Q2. If fmt is set, return the data in a comma separated format. (for the given id/ids). This doesn’t have to be a file
+
+
+The data is available in a mySQL DB.
+
+DB connection details:
+
+host: 128.199.16.225
+user: candidate
+pass: NSDwL8gfr8Xg
+db: extdb
+
+table: tbl_users
+table: tbl_users
+table: tbl_users
+
+
+---
+You are free to use the web/search engines/code snippets, however you must be able to explain the code that you use. Ensure the code adheres to production standards (i.e., following all best practices).
+
+Please complete Q1 
+before attempting Q2.
+
+Evaluation will be based on Q&A, functional correctness, robustness and adherence to coding standards. 
+
+All the best! 
+
+-----
+
+DB host: 128.199.16.225
