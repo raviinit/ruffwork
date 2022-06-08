@@ -1,0 +1,498 @@
+Question 1
+Let’s say, you have been assigned a task for which you will need to use some new technology or you have to implement a new feature that you never implemented.
+The task is doable by you but you need some time to learn the whole thing and accomplish.
+How would you go about learning the things expected or required of you?
+
+Yes, almost everything is doable. Once I came to know it's doable I just started working on the basic part of it on the local machine itself and/or by creating a mockup or sample template or POC. Before I start this I may go through any online articles if I don't know few of the things or technology and I get them in real quick and try to accomplish them on POC itself. And I am also a quick learner and I do it when project demands.
+
+Question 2
+
+Explain your understanding of MVC patterns briefly.
+
+MVC is a light weight design pattern, which make our life easier to implement or develop the code when we use any of frameworks (in case of PHP i.e. Laravel, CodeIgniter, Yii, CakePHP, Zend etc.);
+
+MVC helps us to maintain the code properly and easy to extend the code by adding up the new features as per the requirement needs. Code can also be reusable. We could keep the business rules, front-end and database interactions separately and which makes us achieve the desired outcome without difficulty and easy to make change requests to fulfill.
+
+Question 3
+
+Is there a way to find out the IP of the server where a website was hosted. How?
+
+We could achieve this by using a server side global variable i.e. $_SERVER[‘SERVER_ADDR’]
+
+Question 4
+
+What are the differences between GET and POST methods? What are their limitations? For
+for example, you have the following fields in a form. Which method you will use to submit the form and
+why?
+Title, Body, Image, URL
+
+GET - when we use this as a FORM method there is a limitation of form data to be sent to the server i.e. 1024 bytes. And the data would be insecure while sending to the server, which would easily make the hacker steal in case of sending confidential data. And the entire form data will be shown as a query string on the browser and these URLs will be cached in the browser itself.
+
+POST - when we use this as a FORM method there is no limitation of form data to be sent to the server i.e. unlimited data can also be sent. And the data would also be secured and hidden while sending it to the server and these URLs will not be cached in the browser. We use this in most of the scenarios.
+
+From above form fields I would go for POST method to submit, because we could send even text data and/or Image data and URL strings as well to the server. The way we validate/sanitize the data is different when we use this method.
+
+Question 5
+
+What will be the output of the following code block?
+
+<?php
+$i =  0  ;
+echo  $i .  " " ;
+echo  $i ++. " " ;
+echo ++ $i ;
+?>
+
+Syntax error would come at statement echo $i . “ ” ; otherwise it prints 0 0 2 after we fix the bugs.
+Question 6
+
+a. Let’s say you have an array like follow
+
+<?php
+$a  = array( 'apple'  =>  'Steve Jobs' ,  'microsoft'  =>  'Bill Gates' ,  'google'  =>  'Larry Page' );
+?>
+
+You need to sort this array keeping the key value association intact. Which PHP sort function
+you will be using?
+
+For this I would go for asort($a, SORT_NUMERIC);
+
+b. Now say, you have the code like below
+
+<?php
+/**
+* here is the code that generates the value for $a
+*
+*/
+$query  =  "select company_name,owner from company" ;
+$a  =  mysql_fetch_array (  $query );
+sort (  $a );
+?>
+
+As you see, $a is now an array after reading the value from database. What is the wrong here in
+code? If you think there is something wrong here, please suggest a fix.
+Clue: Consider the case when no value is fetched from database. i.e.: company table was empty.
+
+Here also I would go for asort($a, SORT_NUMERIC);
+If in case of company table empty the above should work.
+And the query would return many records from the table, query execution time may increase based on the records so the query needs to be optimized first. 
+Question 7
+
+Which of the following comparisons will evaluate to true?
+Choose one
+
+"top" === 0
+1 == "1time"
+'t' == t
+1 === "1time"
+"top" == 0
+
+False
+True
+Undefined
+False
+True
+Question 8
+
+Suppose we have 4 tables as shown below:
+
+COURSES table
+- CID: required, alphanumeric: course number (primary key)
+- CTITLE: required, alphanumeric: course title
+- CDUR: required, numeric: course duration (in days).
+
+SESSIONS table
+- SNO: required, numeric: session number (primary key).
+- S_CID: optional, alphanumeric: course number (foreign key to COURSES).
+- SDATE: optional: start date of the session.
+- SINS_PNO: required, numeric: session instructor (foreign key to PERSONS).
+- SCANCEL: optional: indicates if the session is cancelled (“C” means cancelled,
+empty (NULL) means not cancelled).
+
+PERSONS table
+- PNO: required, numeric: person number (primary key).
+- PNAME: optional, alphanumeric: name.
+- P_CONO: optional, numeric: number of the company the person works for.
+
+ENROLMENTS table
+- E_SNO: required, numeric: session number for the enrolment (foreign key to
+SESSIONS) (primary key together with E_PNO)
+- E_PNO: required, numeric: the enrollee (foreign key to PERSONS) (primary key
+together with E_SNO)
+- ECANCEL: optional: “C” when enrolment was cancelled, NULL if not cancelled.
+
+a)
+Write a query to fetch the number of all sessions for which none of the enrolments have
+been cancelled.
+
+SELECT * FROM SESSIONS s
+LEFT JOIN ENROLMENTS e on e.E_SNO == s.SNO WHERE e.ECANCEL <> 'c';
+
+b)
+Write a query to fetch the names of all instructors who have in addition also followed
+more than 1 course.
+
+SELECT * FROM PERSONS p
+LEFT JOIN SESSIONS s on s.SINS_PNO = p.PNO 
+LEFT JOIN ENROLMENTS e on e.E_PNO = p.PNO;
+
+
+Question 9
+
+Differentiate between fixed, fluid and responsive layout?
+
+A fixed layout has a wrapper that is a fixed width and the components inside it have either percentage widths or fixed widths. The important thing is that the container element is set to not move. No matter what screen resolution the visitor has, will see the same width as other visitors.
+
+In a fluid layout, the majority of the components inside have percentage widths and thus adjust to the user’s screen resolution automatically.
+
+Responsive layout takes the best of the two worlds of fluid and adaptive design layouts. The interface has a slight layout depending on the screen size it’s viewed on. Also, depending on the screen size, elements will stretch or shrink accordingly. Responsive layout provides a custom experience for whichever screen size it’s viewed on.
+
+Question 10
+
+What is the output of the following code snippet?
+
+<?php
+class  ClassOne  {
+  protected  $a  =  10 ;
+  public function  changeValue (  $b ) {
+    $this -> a  =  $b ;
+  }
+}
+
+class  ClassTwo  extends  ClassOne  {
+  protected  $b  =  10 ;
+  public function  changeValue (  $b ) {
+    $this -> b  =  10 ;
+  }
+  parent :: changeValue (  $this -> a  +  $this -> b  );
+  public function  displayValues () {
+    print  "a:  {  $this -> a  }  , b:  {  $this -> b  }  \n" ;
+  }
+}
+
+$obj  = new  ClassTwo ();
+$obj -> changeValue (  20 );
+$obj -> changeValue (  10 );
+$obj -> displayValues ();
+?>
+
+10 20
+
+Question 11
+
+What is the use of the following functions in PHP? Which of the following you use most and
+why?
+
+<?php include(); include_once();require();require_once(); ?>
+
+Above are used to include the files when needed in the current script. 
+include(): we use this to include a file in the current script, this makes sure the file includes all the time whenever we need, thus it may cause ‘predifined’ errors in the current script.
+include_once(): we use this to include a file in the current script, this makes sure the file includes only once whenever we added this statement, thus it may not cause ‘predifined’ errors in the current script.
+require(): we use this to include a file in the current script, this makes sure the file includes all the time whenever we need, thus it may cause ‘predifined’ errors in the current script and throws an error and exits the script when the file not found.
+require_once(): we use this to include a file in the current script, this makes sure the file includes only once whenever we added this statement, thus it may not cause ‘predifined’ errors in the current script and throws an error and exits the script when the file is not found.
+
+
+Question 12
+
+Write the pseudo-code for the bubble sort algorithm.
+
+Given would be the pseudo-code for bubble sort algorithm.
+
+function bSort(&$a) 
+{
+    $n = sizeof($a); 
+  
+    // traverse through all array elements 
+    for ($i = 0; $i < $n; $i++)  
+    { 
+        // last i elements are already in place 
+        for ($j = 0; $j < $n - $i - 1; $j++)  
+        { 
+            // traverse the array from 0 to n-i-1 
+            // swap if the element found is greater than the next element 
+            if ($a[$j] > $a[$j+1])
+            {
+                $t = $a[$j];
+                $a[$j] = $a[$j+1];
+                $a[$j+1] = $t;
+            }
+        }
+    }
+}
+  
+// driver code to test above 
+$a = array(64, 34, 25, 12, 22, 11, 90); 
+  
+$len = sizeof($a); 
+bSort($a); 
+  
+echo "Sorted array : \n"; 
+  
+for ($i = 0; $i < $len; $i++)
+    echo $a[$i]." ";
+
+
+Question 13
+
+What is the purpose of using media queries?
+
+These are mostly used in modern web development of website styles i.e. CSS etc. Media queries is a popular technique for delivering a tailored style sheet (responsive web design) to desktops, laptops, tablets, and mobile phones.
+
+Question 14
+
+Let’s say, you need to support more than one database in your application and this will be
+configurable. Throughout the application to execute a query you will call a function like
+db_query() which will execute the correct database query according to database configuration.
+Which design pattern you will implement for this purpose and why?
+
+I can go for a Factory or Decorator design pattern based on application requirement to change the database dynamically.
+
+
+Question 15
+
+What is function overriding and function overloading? What is the difference between them? Write an example code.
+
+Function overriding, both parent and child classes should have the same function name with and number of arguments. It is used to replace parent methods in child class. The purpose of overriding is to change the behavior of the parent class method.
+
+// This is parent class 
+class R { 
+    // Function ta of parent class 
+    function ra() { 
+        echo "Parent"; 
+    } 
+} 
+  
+// This is child class 
+class S extends R { 
+    // Overriding ra method 
+    function ra() { 
+        echo "\nChild"; 
+    } 
+} 
+// Reference type of parent 
+$r = new R; 
+// Reference type of child 
+$s= new S; 
+// print Parent 
+$r->ra(); 
+// Print child 
+$s->ra(); 
+
+Function overloading contains the same function name and that function performs different tasks according to the number of arguments. For example, find the area of certain shapes where radius is given then it should return the area of the circle. If height and width are given then it should give the area of the rectangle and others.
+
+// Creating a class of type shape
+class shape {
+    // __call is magic function which accepts
+    // function name and arguments
+    function __call($name_of_function, $arguments) {
+              
+        // It will match the function name
+        if($name_of_function == 'area') {
+            switch (count($arguments)) {
+                // If there is only one argument
+                // area of circle
+                case 1:
+                    return 3.14 * $arguments[0];
+                // IF two arguments then area is rectangel;
+                case 2:
+                    return $arguments[0]*$arguments[1];
+            }
+        }
+    }
+}
+      
+// Declaring a shape type object 
+$s = new Shape;
+      
+// Functio call
+echo($s->area(2));
+echo "\n";
+      
+// calling area method for rectangel
+echo ($s->area(4, 2));
+
+Question 16
+
+What is wrong in the following code snippet from security perspective? Can you fix it? Please fix.
+
+$username = $_GET['username'];
+$password = $_GET['password'];
+if(db_query("select id from `user` where username='".$username."' and
+password='".$password."'")) {
+// authentication success
+} else {
+// authentication failure
+}
+
+I would do this as shown below as one of the way:
+$username = isset($_GET['username'])?$_GET['username']:'';
+$password = isset($_GET['password'])?$_GET['password']:'';
+
+if (db_query("select id from `user` where username='".$username."' and username<>'' and password='" $password."'" and password<>'' ))
+{
+	// authentication success
+} else {
+	// authentication failure
+}
+
+
+Question 17
+
+What will be written in console?
+
+var foo = 1;
+function bar() {
+var foo = 2;
+}
+bar();
+console.log(foo);
+
+1 will be written since the ‘foo’ variable has no scope in side the bar() function.
+
+
+Question 18
+
+Consider the following database table and query. What will be the best possible indexes that will
+help speed up the process of executing the query?
+
+CREATE TABLE MYTABLE ( ID
+INT, NAME VARCHAR (100), ADDRESS1
+VARCHAR(100), ZIPCODE VARCHAR(10), CITY
+VARCHAR(100), ADDRESS2
+VARCHAR(50), PROVINCE VARCHAR(2) );
+
+SELECT ID, VARCHAR FROM MYTABLE WHERE ID BETWEEN 0 AND 100 ORDER BY NAME, ZIPCODE;
+
+Query should be like below, and the non clustered index would fasten the execution process. 
+SELECT ID, VARCHAR FROM MYTABLE WHERE ID <= 100 ORDER BY NAME, ZIPCODE;
+
+
+Question 19
+
+What is the difference between session and cookie? Name an application feature for which you
+will use cookie and name another application feature for which you will use session. Write
+reasons supporting your decision of using session/cookie.
+
+Cookie is often used to identify a user. A cookie is a small file that the server embeds on the user's browser in the computer. Each time the same computer requests a page with a browser, it will send the cookie back to the server.
+
+// Example:
+// Syntax to create cookie at server side: setcookie(name, value, expire, path, domain, secure, httponly);
+$cookie_name = "user";
+$cookie_value = "Ravinder L";
+setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+if (!isset($_COOKIE[$cookie_name])) {
+  echo "Cookie named '" . $cookie_name . "' is not set!";
+} else {
+  echo "Cookie '" . $cookie_name . "' is set!<br>";
+  echo "Value is: " . $_COOKIE[$cookie_name];
+}
+
+Session is often used to identify a user at the server side. Session variables solve the problem of user identification by storing user information to be used across multiple pages (e.g. username, email, address etc). By default, session variables last until the user closes the browser. Web Server creates the session variable at the server and sends to the browser as well, whenever user requests send to the server the session value also send back to the server and evaluates to find out the user where he is coming from or valid or not.
+
+// Example:
+// start the session
+session_start();
+// set session variables
+$_SESSION["username"] = "ravinder";
+$_SESSION["email"] = "raviinit@ymail.com";
+echo "Session variables are set.";
+
+Question 20
+
+How do you get the text (Mr/Mrs etc), value (1/2 etc) of a selected option?
+
+<select id="pcdsselect">
+<option value="1">Mr</option>
+<option value="2">Mrs</option>
+<option value="3">Ms</option>
+<option value="4">Dr</option>
+<option value="5">Prof</option>
+</select>
+
+Below given would give desired output:
+$("#pcdsselect").attr(‘selected’, ‘selected’).val();
+
+Question 21
+
+What is normalization? What are all the different normalizations?
+
+Normalization is a systematic approach of decomposing tables to eliminate data redundancy (repetition) and undesirable characteristics like Insertion, Update and Deletion anomalies. It is a multi-step process that puts data into tabular form, removing duplicated data from the relation tables.
+
+There are First, Second, Third, BCNF and Fourth Normal forms.
+
+Question 22
+
+Write the jQuery code for selecting the 1st div element among the divs which have class=”box”.
+<div class="questions">
+<div class="box"> Question</div>
+<div class="box"> Question</div>
+<div class="box"> Question</div>
+<div class="box"> Question</div>
+<div class="box"> Question</div>
+<div class="box"> Question</div>
+</div>
+
+Below would give desired output:
+$("div .box").first();
+
+
+Question 23
+
+Let’s say, you have a website running live for 2 years. The website responds very slow when there is huge traffic on the website. What are the multiple techniques to improve the performance of your site in this situation?
+
+HTTP requests should be reduced (pages should be cached)
+Redirects should be reduced
+Minify resources i.e. Javascript, CSS, Images etc.
+Enable Gzip compression
+Optimize images
+Optimize CSS and JavaScript
+Code should be proper, code reusability should be there
+SQL query optimization should be there (queries should be cached)
+At last server side performance to be taken care in the form of load balancing etc.
+
+
+Question 24
+
+Tell us about different types of CSS positioning.
+
+CSS positions would be given:
+static, relative, absolute, fixed and sticky
+Question 25
+
+What is the output of the following code block?
+<?php
+$i =  10 ;
+if( $i >  0  ||  $i ++) {
+}
+$i ++;
+echo
+$i ;
+?>
+
+Syntax error is there, if it’s cleared the output would be 10.
+
+
+Question 26
+
+What is the difference between margin and padding in CSS?
+
+A margin is the space around an element and padding refers to the space between an element and the content inside it.
+
+
+Question 27
+
+Write the HTML code for a link which will open in a new window.
+
+A simple example is given below, we could also use javascript etc. to do it in differently.
+<a href="/filename.html" target="_blank">Open page in new window</a>
+
+
+Question 28
+
+Consider the following SQL statement. What will be the best idea for limiting the amount of data
+returned by it?
+
+SELECT * FROM MY_TABLE
+
+Better we keep the automatic limit to be defined first itself to avoid the memory issues. Afterwards we could optimize the query based on criteria.
+
