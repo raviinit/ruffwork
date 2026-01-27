@@ -56,3 +56,6 @@ And few more
 
 - Video demos showcasing Laravel, Bootstrap UI, and core PHP code walkthroughs
 - Architecture documents illustrating system design and implementation approaches
+
+Bit more in short:
+Developed several projects and applications, including APIs, Payment gateway integrations, Google Maps, Vehicle/GPS tracking, etc. for Logistics, Gaming, eCommerce, Health and Finance domains, also provided solutions and POCs using PHP, Laravel, CodeIgniter, Zend, Symfony, Classic ASP, JavaScript, jQuery, HTML, CSS, etc. technologies on non-cloud (dedicated servers) and cloud servers, i.e. Azure, AWS, etc. Migrated and configured VMs deployed applications on EC2, Lightsail, etc. cloud platforms. Used Docker containers in the most recent companies and used React as the front-end, which consumes the developed APIs. Since I have good working knowledge of multiple technologies, I can support and/or enhance the applications as per the requirements. I am a quick learner and can understand the system easily for any development.
